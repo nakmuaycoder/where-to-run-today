@@ -1,5 +1,7 @@
 # 🌲 where-to-run-today
 
+![CI](https://github.com/nakmuaycoder/where-to-run-today/actions/workflows/ci.yml/badge.svg)
+
 🔥 **Forest Fire Risk Monitor – Southern France**
 
 This project monitors the accessibility of forest massifs in several departments of Southern France based on wildfire risk levels published by local prefectures. It helps runners and hikers know exactly where they can safely go during the high-risk summer season.
