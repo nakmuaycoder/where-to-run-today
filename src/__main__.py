@@ -38,7 +38,8 @@ def run_scrap(config_path: str, mock: bool = False) -> None:
             "23": 3,  # Sainte-Victoire
         }
         # We still need forest_ids to map IDs to names
-        scraper.forest_ids = scraper._get_forest_ids()
+        # Use hardcoded IDs in mock mode to avoid network dependency
+        scraper.forest_ids = {"1": "Alpilles", "3": "Calanques", "23": "Sainte-Victoire"}
         scraper.results = scraper.process()
 
         open_forests: List[str] = []
