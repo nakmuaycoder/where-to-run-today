@@ -3,8 +3,8 @@ from scraper import Scraper
 
 def test_scraper_url_construction():
     scraper = Scraper(department="83")
-    assert "13" in scraper.prefecture_url
-    assert "13" in scraper.data_json_url
+    assert "83" in scraper.prefecture_url
+    assert "83" in scraper.data_json_url
 
 
 def test_interpret_level():
