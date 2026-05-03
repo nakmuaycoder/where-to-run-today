@@ -8,14 +8,16 @@ This project monitors the accessibility of forest massifs in several departments
 
 ## 🛡️ Context & Safety
 
-The Mediterranean forests are extremely vulnerable to wildfires during the summer.
+In Southern France, access to forest massifs is strictly regulated from **June 1st to September 30th** due to extreme wildfire risks. These regulations are updated **daily at 5:00 PM (17h)** for the following day.
+
+**Why use this tool?**
+Checking the prefecture's website every day before a run can be tedious. This project automates the check and notifies you directly, so you never miss a safe window or risk a heavy fine.
 
 **Why are these restrictions necessary?**
 - 🔥 **High Vulnerability**: Heat, wind, and drought make vegetation a "tinderbox".
 - 🚶 **Human Origin**: **90% of forest fires are caused by human activity** (negligence, cigarettes, tools).
 - 🚑 **Public Safety**: Restrictions protect people from being trapped by smoke or flames.
 - 🚒 **Emergency Services**: Less people in the forest means firefighters can focus entirely on fighting the fire front safely.
-- 🌳 **Biodiversity**: Preserving our natural heritage for future generations.
 
 *This tool helps you respect these vital safety regulations by checking access status daily.*
 
