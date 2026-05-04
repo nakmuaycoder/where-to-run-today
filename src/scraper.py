@@ -199,9 +199,9 @@ class Scraper:
         for row in rows:
             cols = row.find_all("td")
             if len(cols) >= 2:
-                forest_id: str = row.get("id")
-                forest_name: str = cols[1].text.strip()
-                forest_ids[forest_id] = forest_name
+                if forest_id := row.get("id"):
+                    forest_name: str = cols[1].text.strip()
+                    forest_ids[forest_id] = forest_name
 
         return forest_ids
 
