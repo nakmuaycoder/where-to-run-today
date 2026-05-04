@@ -194,7 +194,7 @@ class Scraper:
             logger.error("Could not find the forest table on the page")
             return {}
 
-        rows = table.find("tbody").find_all("tr")
+        rows = table.find_all("tr")
         forest_ids: Dict[str, str] = {}
         for row in rows:
             cols = row.find_all("td")
