@@ -159,7 +159,7 @@ class Scraper:
     def _get_levels(self) -> Dict[str, int]:
         """Fetches risk levels from the JSON data source.
 
-        Tries today's date first, then falls back to tomorrow's date.
+        Tries tomorrow's date first, then falls back to today's date.
 
         Returns:
             A dictionary mapping forest IDs to risk levels.
