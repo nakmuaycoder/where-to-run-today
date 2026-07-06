@@ -157,21 +157,55 @@ class Scraper:
             return ""
 
     def _get_levels(self) -> Dict[str, int]:
-        """Fetches today's risk levels from the JSON data source.
+        """Fetches risk levels from the JSON data source.
+
+        Tries today's date first, then falls back to tomorrow's date.
 
         Returns:
             A dictionary mapping forest IDs to risk levels.
         """
-        today_str: str = datetime.datetime.today().strftime("%Y%m%d")
-        url: str = f"{self.data_json_url.rstrip('/')}/{today_str}.json"
-        logger.info(f"Fetching levels from {url}")
-        content: str = self._download(link=url)
+        today = datetime.datetime.today()
+        dates_to_try = [
+            (today + datetime.timedelta(days=1)).strftime("%Y%m%d"),
+            today.strftime("%Y%m%d"),
+        ]
+
+        content = ""
+        used_date = ""
+        for date_str in dates_to_try:
+            url = f"{self.data_json_url.rstrip('/')}/{date_str}.json"
+            logger.info(f"Fetching levels from {url}")
+            content = self._download(link=url)
+            if content:
+                used_date = date_str
+                break
+
         if not content:
             return {}
+
+        logger.info(f"Successfully retrieved levels data for {used_date}")
         try:
-            return json.loads(content)
-        except json.JSONDecodeError:
-            logger.error("Failed to decode JSON levels data")
+            data = json.loads(content)
+            if isinstance(data, dict) and "massifs" in data:
+                raw_massifs = data["massifs"]
+                parsed_levels = {}
+                for key, val in raw_massifs.items():
+                    if isinstance(val, list) and len(val) > 0:
+                        parsed_levels[key] = int(val[0])
+                    elif isinstance(val, (int, str)):
+                        parsed_levels[key] = int(val)
+                return parsed_levels
+            elif isinstance(data, dict):
+                parsed_levels = {}
+                for key, val in data.items():
+                    if isinstance(val, list) and len(val) > 0:
+                        parsed_levels[key] = int(val[0])
+                    else:
+                        parsed_levels[key] = int(val)
+                return parsed_levels
+            return {}
+        except (json.JSONDecodeError, ValueError, TypeError) as e:
+            logger.error(f"Failed to parse levels data: {e}")
             return {}
 
     def _get_forest_ids(self) -> Dict[str, str]:

@@ -88,7 +88,7 @@ Create/edit `src/config.json` with your credentials and preferences:
 Test the notification system and scraping logic even during off-season using the mock mode:
 
 ```bash
-uv run src/__main__.py --mock
+uv run src/main.py --mock
 ```
 
 ## 📊 Risk Levels

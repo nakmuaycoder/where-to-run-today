@@ -20,7 +20,7 @@ format:
 
 mock:
 	@echo "Running scraper in mock mode..."
-	uv run src/__main__.py --mock
+	uv run src/main.py --mock
 
 clean:
 	@echo "Cleaning up..."
