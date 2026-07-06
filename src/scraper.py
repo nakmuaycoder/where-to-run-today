@@ -188,13 +188,14 @@ class Scraper:
             data = json.loads(content)
             if isinstance(data, dict) and "massifs" in data:
                 raw_massifs = data["massifs"]
-                parsed_levels = {}
-                for key, val in raw_massifs.items():
-                    if isinstance(val, list) and len(val) > 0:
-                        parsed_levels[key] = int(val[0])
-                    elif isinstance(val, (int, str)):
-                        parsed_levels[key] = int(val)
-                return parsed_levels
+                if isinstance(raw_massifs, dict):
+                    parsed_levels = {}
+                    for key, val in raw_massifs.items():
+                        if isinstance(val, list) and len(val) > 0:
+                            parsed_levels[key] = int(val[0])
+                        elif isinstance(val, (int, str)):
+                            parsed_levels[key] = int(val)
+                    return parsed_levels
             elif isinstance(data, dict):
                 parsed_levels = {}
                 for key, val in data.items():
