@@ -201,7 +201,7 @@ class Scraper:
                 for key, val in data.items():
                     if isinstance(val, list) and len(val) > 0:
                         parsed_levels[key] = int(val[0])
-                    else:
+                    elif isinstance(val, (int, str)):
                         parsed_levels[key] = int(val)
                 return parsed_levels
             return {}
