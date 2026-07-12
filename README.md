@@ -91,6 +91,27 @@ Test the notification system and scraping logic even during off-season using the
 uv run python -m where_to_run_today.main --mock
 ```
 
+## 🤖 GitHub Actions Automation
+
+The project includes a GitHub Actions workflow (`.github/workflows/daily_check.yml`) to automatically run the scraper every day and send the SMS notification to your phone.
+
+### How it works
+
+1. **Schedule**: The workflow is configured to run automatically every day at **20:00 (Paris time)** (18:00 UTC) during the summer season, which corresponds to the time when next-day access data is guaranteed to be updated by the prefectures.
+2. **Manual Trigger**: You can also trigger the workflow manually at any time from the "Actions" tab on GitHub.
+
+### Setup Instructions
+
+To configure the automation on your repository:
+
+1. Go to your GitHub repository settings.
+2. Navigate to **Settings** > **Secrets and variables** > **Actions**.
+3. Create the following **Repository secrets**:
+   - `FREE_MOBILE_USER`: Your Free Mobile SMS API username.
+   - `FREE_MOBILE_PASS`: Your Free Mobile SMS API key/password.
+   - `DEPARTMENT` (Optional): The department code to monitor (e.g., `13`, `83`). Defaults to `13` if not provided.
+   - `WATCHLIST` (Optional): A JSON array of massifs to watch, e.g., `["Alpilles", "Calanques"]` or `["ALL"]`. Defaults to `["ALL"]`.
+
 ## 📊 Risk Levels
 
 The script interprets the official risk levels as follows:

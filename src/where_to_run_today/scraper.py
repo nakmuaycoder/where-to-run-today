@@ -87,17 +87,18 @@ class Scraper:
             logger.info("Scraping successful.")
 
             open_forests: List[str] = []
-            monitor_all: bool = not self.watchlist or "ALL" in [w.upper() for w in self.watchlist]
+            watchlist_lower = {w.lower() for w in self.watchlist}
+            monitor_all: bool = not self.watchlist or "all" in watchlist_lower
 
             for forest, level in self.results.items():
                 status: str = self._interpret_level(level)
                 is_open: bool = level in [1, 2]
 
                 # Filter by watchlist unless monitor_all is True
-                if not monitor_all and forest not in self.watchlist:
+                if not monitor_all and forest.lower() not in watchlist_lower:
                     continue
 
-                print(f"{forest.capitalize()}: {status} (Level {level})")
+                print(f"{forest}: {status} (Level {level})")
                 if is_open:
                     open_forests.append(forest)
 
@@ -109,7 +110,7 @@ class Scraper:
                         date_label = dt.strftime("%d/%m/%Y")
                     except Exception:
                         date_label = self.used_date
-                message: str = f"🏃 Forests OPEN on {date_label}: " + ", ".join(open_forests)
+                message: str = self.format_status_message(date_label)
                 logger.info(f"Notification: {message}")
                 self._notify(message)
             else:
@@ -117,6 +118,31 @@ class Scraper:
 
         except Exception as e:
             logger.error(f"An error occurred during scraping: {e}")
+
+    def format_status_message(self, date_label: str, is_mock: bool = False) -> str:
+        """Formats the status of massifs into a list with plain text symbols.
+
+        Args:
+            date_label: The date string to display, or empty.
+            is_mock: Whether the scraper is running in mock mode.
+
+        Returns:
+            A string with the status of each watched massif.
+        """
+        watchlist_lower = {w.lower() for w in self.watchlist}
+        monitor_all: bool = not self.watchlist or "all" in watchlist_lower
+        prefix = "[MOCK] " if is_mock else ""
+        date_suffix = f" on {date_label}" if date_label else ""
+        header = f"{prefix}Massifs{date_suffix}:"
+        lines = [header]
+
+        for forest, level in self.results.items():
+            if not monitor_all and forest.lower() not in watchlist_lower:
+                continue
+            symbol = "[OK]" if level in [1, 2] else "[KO]"
+            lines.append(f"{symbol} {forest}")
+
+        return "\n".join(lines)
 
     def process(self) -> Dict[str, int]:
         """Maps forest names to their corresponding risk levels.
