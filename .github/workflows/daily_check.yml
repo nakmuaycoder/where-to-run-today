@@ -47,4 +47,4 @@ jobs:
           EOF
 
       - name: Run Scraper
-        run: uv run src/main.py
+        run: uv run python -m where_to_run_today.main

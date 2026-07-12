@@ -183,25 +183,23 @@ class Scraper:
             today.strftime("%Y%m%d"),
         ]
 
-        content = ""
-        self.used_date = ""
+        data = None
         for date_str in dates_to_try:
             url = f"{self.data_json_url.rstrip('/')}/{date_str}.json"
             logger.info(f"Fetching levels from {url}")
             content = self._download(link=url)
             if content:
-                self.used_date = date_str
-                break
+                try:
+                    data = json.loads(content)
+                    self.used_date = date_str
+                    break
+                except json.JSONDecodeError as e:
+                    logger.warning(f"Failed to decode JSON levels data for {date_str}: {e}")
 
-        if not content:
+        if data is None:
             return {}
 
         logger.info(f"Successfully retrieved levels data for {self.used_date}")
-        try:
-            data = json.loads(content)
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to decode JSON levels data: {e}")
-            return {}
 
         parsed_levels = {}
         raw_data = {}

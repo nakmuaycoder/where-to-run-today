@@ -7,8 +7,8 @@ and initiates the scraping process.
 import argparse
 from typing import List
 
-from config import read_config
-from scraper import Scraper
+from .config import read_config
+from .scraper import Scraper
 
 
 def run_scrap(config_path: str, mock: bool = False) -> None:
