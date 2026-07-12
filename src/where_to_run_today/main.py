@@ -43,13 +43,14 @@ def run_scrap(config_path: str, mock: bool = False) -> None:
         scraper.results = scraper.process()
 
         open_forests: List[str] = []
-        monitor_all: bool = not scraper.watchlist or "ALL" in [w.upper() for w in scraper.watchlist]
+        watchlist_lower = {w.lower() for w in scraper.watchlist}
+        monitor_all: bool = not scraper.watchlist or "all" in watchlist_lower
 
         for forest, level in scraper.results.items():
-            if not monitor_all and forest not in scraper.watchlist:
+            if not monitor_all and forest.lower() not in watchlist_lower:
                 continue
             status: str = scraper._interpret_level(level)
-            print(f"{forest.capitalize()}: {status} (Level {level})")
+            print(f"{forest}: {status} (Level {level})")
             if level in [1, 2]:
                 open_forests.append(forest)
 
