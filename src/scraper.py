@@ -70,6 +70,7 @@ class Scraper:
         self.forest_ids: Dict[str, str] = {}
         self.levels: Dict[str, int] = {}
         self.results: Dict[str, int] = {}
+        self.used_date: str = ""
 
     def run(self) -> None:
         """Executes the scraping process and sends notifications if necessary."""
@@ -101,7 +102,14 @@ class Scraper:
                     open_forests.append(forest)
 
             if open_forests:
-                message: str = "🏃 Forests OPEN today: " + ", ".join(open_forests)
+                date_label = "today"
+                if self.used_date:
+                    try:
+                        dt = datetime.datetime.strptime(self.used_date, "%Y%m%d")
+                        date_label = dt.strftime("%d/%m/%Y")
+                    except Exception:
+                        date_label = self.used_date
+                message: str = f"🏃 Forests OPEN on {date_label}: " + ", ".join(open_forests)
                 logger.info(f"Notification: {message}")
                 self._notify(message)
             else:
@@ -165,26 +173,30 @@ class Scraper:
         Returns:
             A dictionary mapping forest IDs to risk levels.
         """
-        today = datetime.datetime.now(zoneinfo.ZoneInfo("Europe/Paris"))
+        try:
+            tz = zoneinfo.ZoneInfo("Europe/Paris")
+        except zoneinfo.ZoneInfoNotFoundError:
+            tz = None
+        today = datetime.datetime.now(tz)
         dates_to_try = [
             (today + datetime.timedelta(days=1)).strftime("%Y%m%d"),
             today.strftime("%Y%m%d"),
         ]
 
         content = ""
-        used_date = ""
+        self.used_date = ""
         for date_str in dates_to_try:
             url = f"{self.data_json_url.rstrip('/')}/{date_str}.json"
             logger.info(f"Fetching levels from {url}")
             content = self._download(link=url)
             if content:
-                used_date = date_str
+                self.used_date = date_str
                 break
 
         if not content:
             return {}
 
-        logger.info(f"Successfully retrieved levels data for {used_date}")
+        logger.info(f"Successfully retrieved levels data for {self.used_date}")
         try:
             data = json.loads(content)
         except json.JSONDecodeError as e:
