@@ -1,0 +1,50 @@
+name: Daily Forest Fire Risk Monitor
+
+on:
+  schedule:
+    # Runs daily at 20:00 Paris time (18:00 UTC) during summer season (DST / UTC+2)
+    - cron: '0 18 * * *'
+  workflow_dispatch: # Allows running manually from the GitHub Actions tab
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-path: "uv.lock"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Create config.json from secrets
+        env:
+          FREE_MOBILE_USER: ${{ secrets.FREE_MOBILE_USER }}
+          FREE_MOBILE_PASS: ${{ secrets.FREE_MOBILE_PASS }}
+          DEPARTMENT: ${{ secrets.DEPARTMENT }}
+          WATCHLIST: ${{ secrets.WATCHLIST }}
+        run: |
+          DEPT="${DEPARTMENT:-13}"
+          USER="${FREE_MOBILE_USER}"
+          PASS="${FREE_MOBILE_PASS}"
+          WATCH="${WATCHLIST:-[\"ALL\"]}"
+
+          cat <<EOF > src/config.json
+          {
+            "department": "$DEPT",
+            "free_mobile_user": "$USER",
+            "free_mobile_pass": "$PASS",
+            "watchlist": $WATCH
+          }
+          EOF
+
+      - name: Run Scraper
+        run: uv run python -m where_to_run_today.main

@@ -7,6 +7,7 @@ data from prefecture websites to determine if forests are open for activities.
 import datetime
 import json
 import logging
+import zoneinfo
 from typing import Dict, List, Optional
 
 import requests
@@ -69,6 +70,7 @@ class Scraper:
         self.forest_ids: Dict[str, str] = {}
         self.levels: Dict[str, int] = {}
         self.results: Dict[str, int] = {}
+        self.used_date: str = ""
 
     def run(self) -> None:
         """Executes the scraping process and sends notifications if necessary."""
@@ -100,7 +102,14 @@ class Scraper:
                     open_forests.append(forest)
 
             if open_forests:
-                message: str = "🏃 Forests OPEN today: " + ", ".join(open_forests)
+                date_label = "today"
+                if self.used_date:
+                    try:
+                        dt = datetime.datetime.strptime(self.used_date, "%Y%m%d")
+                        date_label = dt.strftime("%d/%m/%Y")
+                    except Exception:
+                        date_label = self.used_date
+                message: str = f"🏃 Forests OPEN on {date_label}: " + ", ".join(open_forests)
                 logger.info(f"Notification: {message}")
                 self._notify(message)
             else:
@@ -157,22 +166,59 @@ class Scraper:
             return ""
 
     def _get_levels(self) -> Dict[str, int]:
-        """Fetches today's risk levels from the JSON data source.
+        """Fetches risk levels from the JSON data source.
+
+        Tries tomorrow's date first, then falls back to today's date.
 
         Returns:
             A dictionary mapping forest IDs to risk levels.
         """
-        today_str: str = datetime.datetime.today().strftime("%Y%m%d")
-        url: str = f"{self.data_json_url.rstrip('/')}/{today_str}.json"
-        logger.info(f"Fetching levels from {url}")
-        content: str = self._download(link=url)
-        if not content:
-            return {}
         try:
-            return json.loads(content)
-        except json.JSONDecodeError:
-            logger.error("Failed to decode JSON levels data")
+            tz = zoneinfo.ZoneInfo("Europe/Paris")
+        except zoneinfo.ZoneInfoNotFoundError:
+            tz = None
+        today = datetime.datetime.now(tz)
+        dates_to_try = [
+            (today + datetime.timedelta(days=1)).strftime("%Y%m%d"),
+            today.strftime("%Y%m%d"),
+        ]
+
+        data = None
+        for date_str in dates_to_try:
+            url = f"{self.data_json_url.rstrip('/')}/{date_str}.json"
+            logger.info(f"Fetching levels from {url}")
+            content = self._download(link=url)
+            if content:
+                try:
+                    data = json.loads(content)
+                    self.used_date = date_str
+                    break
+                except json.JSONDecodeError as e:
+                    logger.warning(f"Failed to decode JSON levels data for {date_str}: {e}")
+
+        if data is None:
             return {}
+
+        logger.info(f"Successfully retrieved levels data for {self.used_date}")
+
+        parsed_levels = {}
+        raw_data = {}
+        if isinstance(data, dict):
+            if "massifs" in data and isinstance(data["massifs"], dict):
+                raw_data = data["massifs"]
+            else:
+                raw_data = data
+
+        for key, val in raw_data.items():
+            try:
+                if isinstance(val, list) and len(val) > 0:
+                    parsed_levels[key] = int(val[0])
+                elif isinstance(val, (int, str)):
+                    parsed_levels[key] = int(val)
+            except (ValueError, TypeError):
+                logger.warning(f"Failed to parse level for key {key}: {val}")
+
+        return parsed_levels
 
     def _get_forest_ids(self) -> Dict[str, str]:
         """Parses the prefecture website to extract forest names and their IDs.

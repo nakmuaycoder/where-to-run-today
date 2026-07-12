@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-where-to-run-today = "src.__main__:main"
+where-to-run-today = "where_to_run_today.main:main"
 
 [tool.ruff]
 line-length = 100

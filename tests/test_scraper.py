@@ -1,4 +1,4 @@
-from scraper import Scraper
+from where_to_run_today.scraper import Scraper
 
 
 def test_scraper_url_construction():

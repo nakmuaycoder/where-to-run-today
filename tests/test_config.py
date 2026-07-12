@@ -1,6 +1,6 @@
 import json
 
-from config import Config, read_config
+from where_to_run_today.config import Config, read_config
 
 
 def test_config_model():
