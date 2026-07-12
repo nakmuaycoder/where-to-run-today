@@ -54,7 +54,7 @@ def run_scrap(config_path: str, mock: bool = False) -> None:
                 open_forests.append(forest)
 
         if open_forests:
-            message: str = "🏃 [MOCK] Forests OPEN: " + ", ".join(open_forests)
+            message: str = scraper.format_status_message(date_label="", is_mock=True)
             scraper._notify(message)
     else:
         scraper.run()
