@@ -7,6 +7,7 @@ data from prefecture websites to determine if forests are open for activities.
 import datetime
 import json
 import logging
+import zoneinfo
 from typing import Dict, List, Optional
 
 import requests
@@ -164,7 +165,7 @@ class Scraper:
         Returns:
             A dictionary mapping forest IDs to risk levels.
         """
-        today = datetime.datetime.today()
+        today = datetime.datetime.now(zoneinfo.ZoneInfo("Europe/Paris"))
         dates_to_try = [
             (today + datetime.timedelta(days=1)).strftime("%Y%m%d"),
             today.strftime("%Y%m%d"),
@@ -186,28 +187,28 @@ class Scraper:
         logger.info(f"Successfully retrieved levels data for {used_date}")
         try:
             data = json.loads(content)
-            if isinstance(data, dict) and "massifs" in data:
-                raw_massifs = data["massifs"]
-                if isinstance(raw_massifs, dict):
-                    parsed_levels = {}
-                    for key, val in raw_massifs.items():
-                        if isinstance(val, list) and len(val) > 0:
-                            parsed_levels[key] = int(val[0])
-                        elif isinstance(val, (int, str)):
-                            parsed_levels[key] = int(val)
-                    return parsed_levels
-            elif isinstance(data, dict):
-                parsed_levels = {}
-                for key, val in data.items():
-                    if isinstance(val, list) and len(val) > 0:
-                        parsed_levels[key] = int(val[0])
-                    elif isinstance(val, (int, str)):
-                        parsed_levels[key] = int(val)
-                return parsed_levels
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode JSON levels data: {e}")
             return {}
-        except (json.JSONDecodeError, ValueError, TypeError) as e:
-            logger.error(f"Failed to parse levels data: {e}")
-            return {}
+
+        parsed_levels = {}
+        raw_data = {}
+        if isinstance(data, dict):
+            if "massifs" in data and isinstance(data["massifs"], dict):
+                raw_data = data["massifs"]
+            else:
+                raw_data = data
+
+        for key, val in raw_data.items():
+            try:
+                if isinstance(val, list) and len(val) > 0:
+                    parsed_levels[key] = int(val[0])
+                elif isinstance(val, (int, str)):
+                    parsed_levels[key] = int(val)
+            except (ValueError, TypeError):
+                logger.warning(f"Failed to parse level for key {key}: {val}")
+
+        return parsed_levels
 
     def _get_forest_ids(self) -> Dict[str, str]:
         """Parses the prefecture website to extract forest names and their IDs.
