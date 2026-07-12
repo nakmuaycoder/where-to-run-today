@@ -119,7 +119,7 @@ class Scraper:
             logger.error(f"An error occurred during scraping: {e}")
 
     def format_status_message(self, date_label: str, is_mock: bool = False) -> str:
-        """Formats the status of massifs into a list with green/red symbols.
+        """Formats the status of massifs into a list with plain text symbols.
 
         Args:
             date_label: The date string to display, or empty.
@@ -129,15 +129,15 @@ class Scraper:
             A string with the status of each watched massif.
         """
         monitor_all: bool = not self.watchlist or "ALL" in [w.upper() for w in self.watchlist]
-        prefix = " [MOCK]" if is_mock else ""
+        prefix = "[MOCK] " if is_mock else ""
         date_suffix = f" on {date_label}" if date_label else ""
-        header = f"🏃{prefix} Massifs{date_suffix}:"
+        header = f"{prefix}Massifs{date_suffix}:"
         lines = [header]
 
         for forest, level in self.results.items():
             if not monitor_all and forest not in self.watchlist:
                 continue
-            symbol = "🟢" if level in [1, 2] else "🔴"
+            symbol = "[OK]" if level in [1, 2] else "[KO]"
             lines.append(f"{symbol} {forest.capitalize()}")
 
         return "\n".join(lines)

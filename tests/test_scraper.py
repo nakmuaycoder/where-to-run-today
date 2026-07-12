@@ -30,12 +30,12 @@ def test_format_status_message():
 
     # 1. Test formatting with date_label and watchlist filtering
     msg = scraper.format_status_message(date_label="12/07/2026")
-    expected = "🏃 Massifs on 12/07/2026:\n🟢 Alpilles\n🔴 Arbois"
+    expected = "Massifs on 12/07/2026:\n[OK] Alpilles\n[KO] Arbois"
     assert msg == expected
 
     # 2. Test formatting with mock mode
     scraper_mock = Scraper()  # No watchlist, defaults to monitor all
     scraper_mock.results = {"Alpilles": 1, "Arbois": 3, "Calanques": 2}
     msg_mock = scraper_mock.format_status_message(date_label="", is_mock=True)
-    expected_mock = "🏃 [MOCK] Massifs:\n🟢 Alpilles\n🔴 Arbois\n🟢 Calanques"
+    expected_mock = "[MOCK] Massifs:\n[OK] Alpilles\n[KO] Arbois\n[OK] Calanques"
     assert msg_mock == expected_mock
