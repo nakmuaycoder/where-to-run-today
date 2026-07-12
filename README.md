@@ -1,6 +1,6 @@
 # 🌲 where-to-run-today
 
-![CI](https://github.com/nakmuaycoder/where-to-run-today/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/nakmuaycoder/where-to-run-today/actions/workflows/ci.yml/badge.svg) ![Daily Check](https://github.com/nakmuaycoder/where-to-run-today/actions/workflows/daily_check.yml/badge.svg)
 
 🔥 **Forest Fire Risk Monitor – Southern France**
 
