@@ -117,6 +117,8 @@ To configure the automation on your repository:
 During off-season periods (when there are no active forest fire access restrictions), you can disable the daily automated workflow to avoid unnecessary runs.
 
 **Using GitHub CLI (`gh`)**:
+*(Run these commands from inside the repository folder, or add `-R nakmuaycoder/where-to-run-today` if running from elsewhere)*
+
 - **Disable workflow**:
   ```bash
   gh workflow disable daily_check.yml
