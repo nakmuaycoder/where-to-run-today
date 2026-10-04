@@ -112,6 +112,27 @@ To configure the automation on your repository:
    - `DEPARTMENT` (Optional): The department code to monitor (e.g., `13`, `83`). Defaults to `13` if not provided.
    - `WATCHLIST` (Optional): A JSON array of massifs to watch, e.g., `["Alpilles", "Calanques"]` or `["ALL"]`. Defaults to `["ALL"]`.
 
+### ⏯️ Enabling & Disabling the Daily Workflow
+
+During off-season periods (when there are no active forest fire access restrictions), you can disable the daily automated workflow to avoid unnecessary runs.
+
+**Using GitHub CLI (`gh`)**:
+*(Run these commands from inside the repository folder, or add `-R nakmuaycoder/where-to-run-today` if running from elsewhere)*
+
+- **Disable workflow**:
+  ```bash
+  gh workflow disable daily_check.yml
+  ```
+- **Enable workflow**:
+  ```bash
+  gh workflow enable daily_check.yml
+  ```
+
+**Using GitHub Web Interface**:
+1. Go to the **Actions** tab in your repository.
+2. Select **Daily Forest Fire Risk Monitor** in the left sidebar.
+3. Click the `...` menu button at the top-right and select **Disable workflow** (or **Enable workflow**).
+
 ## 📊 Risk Levels
 
 The script interprets the official risk levels as follows:
